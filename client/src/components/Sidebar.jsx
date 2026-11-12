@@ -1,57 +1,94 @@
 import { Link } from 'react-router-dom';
-import SearchBox from './SearchBox.jsx';
-import { useCategories, useFetch } from '../hooks/useFetch';
+import { formatDate, hueFrom, srcSetOf, thumbOf } from '../utils';
 
-export default function Sidebar() {
-  const categories = useCategories();
-  const { data: trending } = useFetch('/posts/trending');
-  const { data: tags } = useFetch('/tags');
+export function Thumb({ post = {}, eager, sizes = '(min-width: 900px) 360px, 100vw' }) {
+  const featuredImage = post?.featuredImage;
+
+  if (featuredImage) {
+    return (
+      <img
+        src={thumbOf(featuredImage)}
+        srcSet={srcSetOf(featuredImage)}
+        sizes={sizes}
+        alt={post?.featuredImageAlt || ''}
+        width="640"
+        height="360"
+        loading={eager ? 'eager' : 'lazy'}
+        decoding="async"
+      />
+    );
+  }
+
+  const categoryName = post?.category?.name || '';
+  const category = categoryName.toLowerCase();
+
+  const art =
+    category.includes('ai') || category.includes('artificial') ? 'ai' :
+    category.includes('cyber') || category.includes('security') ? 'security' :
+    category.includes('cloud') ? 'cloud' :
+    category.includes('code') || category.includes('program') ? 'code' :
+    'software';
 
   return (
-    <aside className="sidebar" aria-label="Sidebar">
-      <section className="widget">
-        <h2 className="widget__title">Search</h2>
-        <SearchBox className="search--sidebar" />
-      </section>
+    <div
+      className={`thumb-fallback thumb-fallback--${art}`}
+      style={{ '--h': hueFrom(post?.title || '') }}
+      aria-hidden="true"
+    >
+      <img src={`/covers/${art}.svg`} alt="" loading="lazy" />
+      <span className="thumb-fallback__label">
+        {categoryName || 'TECH INSIGHT'}
+      </span>
+    </div>
+  );
+}
 
-      {trending?.length > 0 && (
-        <section className="widget">
-          <h2 className="widget__title">Popular articles</h2>
-          <ol className="trending">
-            {trending.map((p) => (
-              <li key={p._id}>
-                <Link to={`/blog/${p.slug}`}>{p.title}</Link>
-                {p.category && <span>{p.category.name}</span>}
-              </li>
-            ))}
-          </ol>
-        </section>
+export function PostMeta({ post = {}, showAuthor = true }) {
+  return (
+    <div className="post-meta">
+      {showAuthor && post?.author?.name && (
+        <span className="post-meta__author">{post.author.name}</span>
       )}
+      <time dateTime={post?.publishedAt || ''}>
+        {post?.publishedAt ? formatDate(post.publishedAt) : ''}
+      </time>
+      {post?.readingTime ? <span>{post.readingTime} min read</span> : null}
+    </div>
+  );
+}
 
-      {categories.length > 0 && (
-        <section className="widget">
-          <h2 className="widget__title">Browse by topic</h2>
-          <ul className="topic-list">
-            {categories.map((c) => (
-              <li key={c._id}>
-                <Link to={`/category/${c.slug}`}>{c.name}</Link>
-                <span>{c.count}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+export default function PostCard({ post = {}, variant = 'card', eager = false }) {
+  if (!post || !post.slug) return null;
 
-      {tags?.length > 0 && (
-        <section className="widget">
-          <h2 className="widget__title">Popular tags</h2>
-          <div className="tag-cloud">
-            {tags.map((t) => (
-              <Link key={t._id} to={`/blog?tag=${t.slug}`}>{t.name}</Link>
-            ))}
-          </div>
-        </section>
-      )}
-    </aside>
+  const href = `/blog/${post.slug}`;
+
+  return (
+    <article className={`post-card post-card--${variant}`}>
+      <Link to={href} className="post-card__media" tabIndex={-1} aria-hidden="true">
+        <Thumb
+          post={post}
+          eager={eager}
+          sizes={variant === 'hero' ? '(min-width: 900px) 640px, 100vw' : undefined}
+        />
+      </Link>
+
+      <div className="post-card__body">
+        {post?.category && variant !== 'compact' && (
+          <Link className="category-link" to={`/category/${post.category.slug}`}>
+            {post.category.name}
+          </Link>
+        )}
+
+        <h3 className="post-card__title">
+          <Link to={href}>{post?.title || 'Untitled article'}</Link>
+        </h3>
+
+        {variant !== 'compact' && (
+          <p className="post-card__excerpt">{post?.excerpt || ''}</p>
+        )}
+
+        <PostMeta post={post} showAuthor={variant !== 'compact'} />
+      </div>
+    </article>
   );
 }
