@@ -3,7 +3,7 @@ import { api } from '../api';
 
 export function useFetch(path) {
   const [state, setState] = useState({
-    data: [],
+    data: null,
     loading: !!path,
     error: null
   });
@@ -23,7 +23,7 @@ export function useFetch(path) {
       .get(path, { signal: controller.signal })
       .then((data) => {
         setState({
-          data: data ?? [],
+          data: data ?? null,
           loading: false,
           error: null
         });
@@ -31,7 +31,7 @@ export function useFetch(path) {
       .catch((error) => {
         if (error.name !== 'AbortError') {
           setState({
-            data: [],
+            data: null,
             loading: false,
             error
           });
