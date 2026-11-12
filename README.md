@@ -54,11 +54,11 @@ cp server/.env.example server/.env
 # 3. create the admin account, the 7 starter categories and sample articles
 npm run seed
 
-# 4. run API (http://localhost:5000) and website (http://localhost:5173)
+# 4. run API (http://localhost:5000) and website (http://localhost:5174)
 npm run dev
 ```
 
-Open http://localhost:5173 for the site and http://localhost:5173/admin to sign in
+Open http://localhost:5174 for the site and http://localhost:5174/admin to sign in
 (default: `admin@example.com` / `ChangeMe@123` – **change this immediately**).
 
 `npm run seed -- --fresh` clears articles, categories, tags and authors, then re-creates the sample content.

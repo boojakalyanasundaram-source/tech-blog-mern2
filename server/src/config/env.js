@@ -7,7 +7,7 @@ export const env = {
   jwtSecret: process.env.JWT_SECRET || 'dev-secret-change-me',
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
   cookieSecure: bool(process.env.COOKIE_SECURE),
-  clientUrls: (process.env.CLIENT_URL || 'http://localhost:5173').split(',').map((s) => s.trim()),
+  clientUrls: (process.env.CLIENT_URL || 'http://localhost:5174').split(',').map((s) => s.trim()),
   siteUrl: (process.env.SITE_URL || 'http://localhost:5000').replace(/\/$/, ''),
   siteName: process.env.SITE_NAME || 'TechPulse',
   siteDescription:

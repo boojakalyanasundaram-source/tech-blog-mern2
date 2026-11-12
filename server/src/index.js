@@ -53,7 +53,7 @@ if (fs.existsSync(clientDist)) {
   app.get('*', htmlHandler(clientDist));
 } else {
   app.get('/', (_req, res) =>
-    res.send('API is running. Start the React app with "npm run dev" (port 5173) or build it with "npm run build".')
+    res.send('API is running. Start the React app with "npm run dev" (port 5174 or build it with "npm run build".')
   );
 }
 
